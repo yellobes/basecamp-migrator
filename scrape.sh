@@ -8,17 +8,24 @@
 
 DIR="."
 COOKIES="$DIR/cookies.txt"
-BASECAMP_ID=1761408
-BASE_URL="https://basecamp.com/$BASECAMP_ID/api/v1"
+
 USERNAME="peter@binarysprocket.com"
 PASSWORD="ph171ps"
+BASECAMP_ID=1761408
+
+BASE_URL="https://basecamp.com/$BASECAMP_ID/api/v1"
+
+URL_FEEDSTOCK="$1"
+
+
+
 
 
 while read line
   do
-    echo curl -k -u "$USERNAME:$PASSWORD" --cookie-jar "$COOKIES" "$BASE_URL/${line//1/1761408} >./data/${line//'/'/-}.json"
+    curl -k -u "$USERNAME:$PASSWORD" --cookie-jar "$COOKIES" "$BASE_URL/${line//1/1761408}" > "./data/${line//'/'/-}.json"
     sleep .05
-  done <"./basecamp.href"
+  done <$URL_FEEDSTOCK
 
 
 
