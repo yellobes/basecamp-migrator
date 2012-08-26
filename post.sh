@@ -1,13 +1,40 @@
 #! /bin/bash
 
 
-#
-#    Peter Novotnak :: Binarysprocket LLC :: 2012
-#
+
+#      [] [] [] []    [] [] [] []    []         []
+
+#      []                      []     []        []
+
+#      [] [] [] []        []         []    []   []
+
+#               []             []    []        []
+
+#      [] [] [] []    [] [] [] []    []         []
+
+#           :: Binarysprocket LLC :: 2012 ::
 
 
 
 
+#///////  stackoverflow.com/q/59895#answer-246128
+
+SOURCE="${BASH_SOURCE[0]}"
+DIR="$( dirname "$SOURCE" )"
+while [ -h "$SOURCE" ]
+do 
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+  DIR="$( cd -P "$( dirname "$SOURCE"  )" && pwd )"
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+
+
+
+dirname "$0"
 
 
 name="post.sh"
@@ -46,7 +73,7 @@ find_project() {
 
 
 find_name() {
-  echo "Importing :: $(basename "$1")"
+  echo "$(basename "$1")"
   return 0
 }
 
@@ -66,8 +93,10 @@ if [ -z "$1" ] || [ -z "$2" ]
     find_project "$project_path"
     con "$?" "Couldn't find the project path specified!"
     project_name="$(find_name "$project_path")"
+    notify-send -i "$DIR/ac-bc.xpm" "Importing ::" "$project_name" 
+    exit
     curl -d "submitted=submitted" \
       --data-urlencode "project[name]=$project_name" \
       --data-urlencode "project[leader_id]=1" \
-      "$activecollab_url/activecollab/public/api.php?path_info=projects&token=2-7UzlPY4InJ24x0yTOeetI6p61ezXYCTT26yPX83v"
+      "$activecollab_url/activecollab/public/api.php?path_info=/projects/add&token=2-7UzlPY4InJ24x0yTOeetI6p61ezXYCTT26yPX83v"
 fi # Have a nice day!
