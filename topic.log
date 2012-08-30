@@ -1,0 +1,3 @@
+== Info: getaddrinfo(3) failed for $activecollab_url:80
+== Info: Couldn't resolve host '$activecollab_url'
+== Info: Closing connection #0

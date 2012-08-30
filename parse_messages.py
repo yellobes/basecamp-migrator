@@ -1,76 +1,76 @@
 #! /usr/bin/python2.7
 
 
-# Parses messages (index.html) and ejects content in csv format
+# Parses topics (index.html) and 
 
 # REQUIRES :: Beautiful Soup 4 :: pip install beautifulsoup | apt-get install python-beautifulsoup
 
 
 
-from bs4 import BeautifulSoup
+from bs4    import BeautifulSoup
+from os     import system
+from time   import clock
+
+from poster import Poster as p
+
+import sys
 import fileinput
+import cgi
+
+project_id = sys.argv[1]
+ac_url = sys.argv[2]
+ac_api_token = sys.argv[3]
+
+p = P()
+
+def post_topic(data) :
+    for topic in topics :
+        p.load(ac_url, data)
+        p.post()
 
 
+# Start the stopwatch
+start = clock()
+# Assemble the soup
+html = ''
 
+for line in sys.stdin :
+    html += line
+soup = BeautifulSoup(html)
 
+tds = soup.find_all('td')
 
-def parse_index() :
-
-    # Assemble the soup from stdin / file
-    html = ''
-    for line in fileinput.input() :
-        html += line
-    soup = BeautifulSoup(html)
-    trs = soup.find_all('tr')
-
-    # Suss out the values
-    x = 0
-    i = 0
-    author = ''
-    link_href = ''
-    link_text = ''
-    description = ''
-    date = ''
-    num_comments = ''
-
-    message = []
-    for tr in trs :
-        tds = tr.find_all('td')
-        for td in tds :
-            if i == 0 :
-                author = td.get_text()
-            elif i == 1 :
-                link_href = td.a.get('href')
-                link_text = td.a.get_text()
-                description = td.get_text()
-            elif i == 2 :
-                date = td.get_text()
-            elif i == 3 :
-                num_comments =  str(td.get_text()).split()[0]
-
-            i = i + 1
-        
-        message = {
+i = 1
+x = 0
+topics = []
+for td in tds :
+    if i == 1 :
+        author = td.get_text()
+    if i == 2 :
+        title = td.a.get_text()
+        description = td.get_text()
+    if i == 3 :
+        date = td.get_text()
+    if i == 4 :
+        num_comments = str( td.get_text() ).split(' ')[0]
+        try :
+            comments_link = td.a.get('href')
+        except AttributeError :
+            comments_link = None
+        # Reset the array and add the values to the topics dict.
+        i = 0
+        topics.append({
             'author' : author,
-            'link_href' : link_href,
-            'link_text' : link_text,
+            'title' : title,
             'description' : description,
             'date' : date,
             'num_comments' : num_comments,
-        }
-        
+            'comments_link' : comments_link,
+        })
+    i = i + 1
 
+print "Parsed topics in ", (clock() - start), " seconds."
 
-def return_results() :
-    message_set = parse_index()
-    print type(message_set)
-
-
-
-
-
-return_results()
-
-
+    
 
 

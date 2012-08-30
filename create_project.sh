@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash -x
 
 
 
@@ -43,7 +43,10 @@ correct_usage="starting post operations!.."
 
 project_path=''
 project_name=''
+project_id=''
 
+echo "Enter ActiveCollab api key: "
+read ac_api_token
 
 # Exit if the argument passed is not zero, and print an error message
 con() {
@@ -93,10 +96,9 @@ if [ -z "$1" ] || [ -z "$2" ]
     find_project "$project_path"
     con "$?" "Couldn't find the project path specified!"
     project_name="$(find_name "$project_path")"
-    notify-send -i "$DIR/ac-bc.xpm" "Importing ::" "$project_name" 
-    exit
-    curl -d "submitted=submitted" \
-      --data-urlencode "project[name]=$project_name" \
-      --data-urlencode "project[leader_id]=1" \
-      "$activecollab_url/activecollab/public/api.php?path_info=/projects/add&token=2-7UzlPY4InJ24x0yTOeetI6p61ezXYCTT26yPX83v"
+    notify-send -i "$DIR/ac-bc.xpm" "Importing ::" "$project_name"
+    project_id="$(curl -sd "submitted=submitted" --data-urlencode "project[name]=$project_name" --data-urlencode "project[leader_id]=1" "$activecollab_url/public/api.php?path_info=/projects/add&token=$ac_api_token" | awk -F'<id>' '{print $2}' | cut -d'<' -f1)"
+    cat "$DIR/$project_path/topics/index.html" | \
+    ./parse_messages.py "$project_id" "$activecollab_url" "$ac_api_token" > /dev/null 2>&1
 fi # Have a nice day!
+
