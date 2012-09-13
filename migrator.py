@@ -9,28 +9,8 @@ import json
 import difflib
 
 
-# Our interface classes
-class bc_JSON :
-    
-    username = ''
-    password = ''
 
-    def authenticate():
-        pass
 
-    def get_comments():
-        pass
-    def get_messages():
-        pass
-    def get_people():
-        pass
-    def get_todolists():
-        pass
-    def get_todos():
-        pass
-
-    def get_events():
-        pass
 
 def get_projects(username, password, company_id, project_name):
     url_dict = {
@@ -109,19 +89,6 @@ def get_messages(username, password, company_id, project_json, topic_json):
     #r = requests.get(url, auth=auth_en(username, password))
 
         
-
-class ac_ :
-    pass
-
-
-
-# Transform input to orderd data ready for output
-class Mapping :
-    pass
-
-# This class walks the topics / 
-class Walker :
-    pass
 
 
 
