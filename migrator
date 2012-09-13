@@ -47,8 +47,15 @@ class bc_JSON :
         auth_en = requests.auth.HTTPBasicAuth
         url = "https://basecamp.com/%(company_id)s/api/v1/projects/%(topic_id)s/topics.json" % url_dict 
         r = requests.get(url, auth_en(username, password))
+        topic_names
         for topic in r.json:
-            print topic['name']
+            topic_names.append(topic.name)
+
+        project_name = difflib.get_close_matches(project_name, topic_names, 1)
+
+        if len(project_name) == 0:
+            print "I couldn't find projects under the name you specified."
+            exit
 
         
 
