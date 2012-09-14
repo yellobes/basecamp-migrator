@@ -9,19 +9,19 @@ import json
 import difflib
 
 
+include = [
+    'comments',
+    'events',
+    'messages',
+    'people',
+    'todolists',
+    'todos', ]
 
 
 
 def get_projects(site, username, password, company_id, project_name):
     url_dict = {
         'co_id' : company_id, }
-    include = [
-        'comments',
-        'events',
-        'messages',
-        'people',
-        'todolists',
-        'todos', ]
     auth_en = requests.auth.HTTPBasicAuth
     url = "https://"+site+"/%(co_id)s/api/v1/projects.json" % url_dict 
     r = requests.get(url, auth=auth_en(username, password))
@@ -49,14 +49,10 @@ def get_projects(site, username, password, company_id, project_name):
             return p
 
 def get_topics(site, username, password, company_id, project_json):
-    class project_obj:
-        id = str(project_json['id'])
-    
-    project = project_obj()
 
     url_dict = {
         'co_id' : company_id,
-        'pr_id' : project.id,
+        'pr_id' : project_json['id'],
         }
 
     auth_en = requests.auth.HTTPBasicAuth
@@ -78,21 +74,21 @@ def get_messages(site, username, password, company_id, project_json, topic_json)
     for message in message_identifiers:
         auth_en = requests.auth.HTTPBasicAuth
         r = requests.get(message['topicable']['url'], auth=auth_en(username, password)).json
+        messages.append(r)
         url_dict = {
             'co_id' : company_id,
             'pr_id' : project_json['id'],
-        } 
-        messages.append(r)
-        for i in r:
-            i['id']
-            url = "https://"+site+"/%(co_id)s/api/v1/projects/%(pr_id)s/messages/%(ms_id)s/comments.json" % url_dict 
+            'ms_id' : message['id'] } 
+        url = "https://"+site+"/%(co_id)s/api/v1/projects/%(pr_id)s/messages/%(ms_id)s/comments.json" % url_dict 
+        comments = requests.get(message['topicable']['url'], auth=auth_en(username, password)).json
+        
 
-    return messages
+    return { 'messages' : messages, 'comments' : comments }
 
 
 
 def put_messages(api_key, messages):
-    
+    pass
         
 
 
