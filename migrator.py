@@ -12,7 +12,7 @@ import difflib
 
 
 
-def get_projects(username, password, company_id, project_name):
+def get_projects(site, username, password, company_id, project_name):
     url_dict = {
         'co_id' : company_id, }
     include = [
@@ -23,7 +23,7 @@ def get_projects(username, password, company_id, project_name):
         'todolists',
         'todos', ]
     auth_en = requests.auth.HTTPBasicAuth
-    url = "https://basecamp.com/%(co_id)s/api/v1/projects.json" % url_dict 
+    url = "https://"+site+"/%(co_id)s/api/v1/projects.json" % url_dict 
     r = requests.get(url, auth=auth_en(username, password))
     project_names = []
     for project in r.json:
@@ -48,7 +48,7 @@ def get_projects(username, password, company_id, project_name):
         if project_name == p['name']:
             return p
 
-def get_topics(username, password, company_id, project_json):
+def get_topics(site, username, password, company_id, project_json):
     class project_obj:
         id = str(project_json['id'])
     
@@ -60,17 +60,14 @@ def get_topics(username, password, company_id, project_json):
         }
 
     auth_en = requests.auth.HTTPBasicAuth
-    url = "https://basecamp.com/%(co_id)s/api/v1/projects/%(pr_id)s/topics.json" % url_dict 
+    url = "https://"+site+"/%(co_id)s/api/v1/projects/%(pr_id)s/topics.json" % url_dict 
     return requests.get(url, auth=auth_en(username, password)).json
 
 
  
 
-def get_messages(username, password, company_id, project_json, topic_json):
-    url_dict = {
-        'co_id' : company_id,
-        'pr_id' : project_json['id'],
-        }
+def get_messages(site, username, password, company_id, project_json, topic_json):
+
 
     message_identifiers = []
     for topic in topic_json:
@@ -80,14 +77,22 @@ def get_messages(username, password, company_id, project_json, topic_json):
     messages = []
     for message in message_identifiers:
         auth_en = requests.auth.HTTPBasicAuth
-        messages.append(requests.get(message['topicable']['url'], auth=auth_en(username, password)).json)
+        r = requests.get(message['topicable']['url'], auth=auth_en(username, password)).json
+        url_dict = {
+            'co_id' : company_id,
+            'pr_id' : project_json['id'],
+        } 
+        messages.append(r)
+        for i in r:
+            i['id']
+            url = "https://"+site+"/%(co_id)s/api/v1/projects/%(pr_id)s/messages/%(ms_id)s/comments.json" % url_dict 
 
     return messages
 
-    #auth_en = requests.auth.HTTPBasicAuth
-    #url = "https://basecamp.com/%(co_id)s/api/v1/projects/%(pr_id)s/messages/%(ms_id)s.json" % url_dict 
-    #r = requests.get(url, auth=auth_en(username, password))
 
+
+def put_messages(api_key, messages):
+    
         
 
 
