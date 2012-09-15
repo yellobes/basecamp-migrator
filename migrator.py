@@ -23,11 +23,12 @@ include = [
 
 
 
-def get_projects(site, username, password, company_id, project_name):
+def get_project(username, password, company_id, project_name):
+    site = 'basecamp.com'
     url_dict = {
         'co_id' : company_id, }
     auth_en = requests.auth.HTTPBasicAuth
-    url = "https://"+site+"/%(co_id)s/api/v1/projects.json" % url_dict 
+    url = "https://"+site+"/%(co_id)s/api/v1/projects.json" % url_dict
     r = requests.get(url, auth=auth_en(username, password))
     project_names = []
     for project in r.json:
@@ -48,22 +49,41 @@ def get_projects(site, username, password, company_id, project_name):
         project_name = project_name[0]
     else:
         exit
-    
+
     for p in r.json:
         if project_name == p['name']:
             return p
 
 
-def get_users(site, username, password, company_id, project_json):
-    
-    url_dict = {
-        'co_id' : company_id,
-        'pr_id' : project_json['id'],
-        }
 
-    auth_en = requests.auth.HTTPBasicAuth
-    url = "https://"+site+"/%(co_id)s/api/v1/projects/%(pr_id)s/people.json" % url_dict 
-    return requests.get(url, auth=auth_en(username, password)).text
+def get_users(site, username, password, company_id, project_json, topic_json, message_json):
+
+    user_ids = []
+    for t in topic_json :
+        x = t['last_updater']['id']
+        if not x in user_ids :
+            user_ids.append(x)
+
+    for m in message_json['messages'] :
+        x = m['creator']['id']
+        if not x in user_ids :
+            user_ids.append(x)
+
+    users = []
+    for user in user_ids :
+        url_dict = {
+            'co_id' : company_id,
+            'pr_id' : project_json['id'],
+            'us_id' : user,
+            }
+
+        auth_en = requests.auth.HTTPBasicAuth
+        url = "https://"+site+"/%(co_id)s/api/v1/people/%(us_id)s.json" % url_dict
+        r = requests.get(url, auth=auth_en(username, password)).text
+        users.append(r)
+
+    return users
+
 
 
 def get_topics(site, username, password, company_id, project_json):
@@ -74,11 +94,11 @@ def get_topics(site, username, password, company_id, project_json):
         }
 
     auth_en = requests.auth.HTTPBasicAuth
-    url = "https://"+site+"/%(co_id)s/api/v1/projects/%(pr_id)s/topics.json" % url_dict 
+    url = "https://"+site+"/%(co_id)s/api/v1/projects/%(pr_id)s/topics.json" % url_dict
     return requests.get(url, auth=auth_en(username, password)).json
 
 
- 
+
 
 def get_messages(site, username, password, company_id, project_json, topic_json):
     message_identifiers = []
@@ -96,20 +116,30 @@ def get_messages(site, username, password, company_id, project_json, topic_json)
         url_dict = {
             'co_id' : company_id,
             'pr_id' : project_json['id'],
-            'ms_id' : message['id'] } 
-        url = "https://"+site+"/%(co_id)s/api/v1/projects/%(pr_id)s/messages/%(ms_id)s/comments.json" % url_dict 
+            'ms_id' : message['id'] }
+        url = "https://"+site+"/%(co_id)s/api/v1/projects/%(pr_id)s/messages/%(ms_id)s/comments.json" % url_dict
         comments.append( requests.get(message['topicable']['url'], auth=auth_en(username, password)).json )
-        
+
 
     return { 'messages' : messages, 'comments' : comments }
 
 
 
+
+
+
+
+
+################################################################
+
+
+
+
 def put_messages(api_key, url, messages_and_comments):
-       
+
     url = 'http://'+url+''
     #requests.get(url
-        
+
 
 
 
